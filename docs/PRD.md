@@ -7,7 +7,6 @@
 **Document Version:** 1.0  
 **Date:** May 23, 2026  
 **Development Timeline:** 4 Months  
-**Development Budget:** $3,200 USD
 
 ---
 
@@ -45,10 +44,6 @@ ArcB2B is a comprehensive B2B e-commerce platform designed for the Bangladesh ma
 - Real-time chat system
 - Payment gateway integration
 - Logistics API integration
-
-**Total Investment:** $3,351 USD
-- Development: $3,200 USD
-- Infrastructure (4 months): $151 USD
 
 ---
 
@@ -139,6 +134,41 @@ ArcB2B is a comprehensive B2B e-commerce platform designed for the Bangladesh ma
 - Low stock alerts
 - Automatic stock updates on orders
 
+**Product Import System (Dual Mode):**
+
+**1. Automatic Import from 1688.com:**
+- Supplier provides 1688.com product URL
+- System automatically scrapes product data:
+  - Product title and description
+  - Product images (all variants)
+  - Specifications and attributes
+  - Pricing information
+  - MOQ details
+  - Variants (size, color, material)
+- Automatic price markup:
+  - Default: 10-20% markup over 1688.com price
+  - Admin configurable markup percentage
+  - Can set different markup rates per category
+  - Per-supplier custom markup settings
+- Product preview before publishing
+- Edit imported data before final submission
+- Bulk URL import (import multiple products at once)
+- Auto-translation of Chinese content to Bangla/English
+
+**2. Manual Product Entry:**
+- Traditional form-based product creation
+- Manual input of all product details
+- Image upload from local device
+- Complete control over all fields
+
+**Admin Controls:**
+- Global markup percentage setting
+- Category-specific markup rates
+- Supplier-specific markup overrides
+- Enable/disable auto-import feature
+- Import history and logs
+- Failed import retry mechanism
+
 **Pricing Structure:**
 - MOQ (Minimum Order Quantity) settings
 - Tiered pricing based on quantity
@@ -146,6 +176,7 @@ ArcB2B is a comprehensive B2B e-commerce platform designed for the Bangladesh ma
 - Sample product pricing
 - Negotiable pricing options
 - Dynamic pricing support
+- Auto-calculated markup pricing
 
 ### 3. Search & Discovery
 
@@ -351,6 +382,13 @@ ArcB2B is a comprehensive B2B e-commerce platform designed for the Bangladesh ma
 - Dispute resolution center
 - Review moderation
 - System settings configuration
+- Product import configuration:
+  - Global markup percentage settings
+  - Category-specific markup rates
+  - Supplier-specific markup overrides
+  - Enable/disable auto-import feature
+  - Import history and audit logs
+  - Failed import management
 
 **Financial Management:**
 - Transaction monitoring
@@ -898,7 +936,21 @@ suppliers.description: text
       discountPercent: Number
     }],
     samplePrice: Number,
-    sampleAvailable: Boolean
+    sampleAvailable: Boolean,
+    markup: {
+      percentage: Number, // Admin configured markup
+      originalPrice: Number, // Original 1688.com price if imported
+      finalPrice: Number // Price with markup applied
+    }
+  },
+  importData: {
+    source: String, // '1688.com' | 'manual' | null
+    sourceUrl: String, // Original 1688.com URL if imported
+    importedAt: Date,
+    importedBy: ObjectId, // ref: users
+    markupApplied: Number, // percentage used at import
+    autoTranslated: Boolean,
+    originalLanguage: String
   },
   manufacturing: {
     leadTime: Number, // days
@@ -1360,6 +1412,60 @@ analytics.userId: 1
 analytics.date: -1
 ```
 
+**13. Admin Settings Collection**
+
+```javascript
+{
+  _id: ObjectId,
+  key: String, // 'markup_settings' | 'import_settings' | etc
+  value: Object,
+  updatedBy: ObjectId, // ref: users
+  updatedAt: Date,
+  createdAt: Date
+}
+
+// Markup Settings Structure
+{
+  key: 'markup_settings',
+  value: {
+    global: {
+      percentage: Number, // Default: 15 (represents 15%)
+      enabled: Boolean
+    },
+    categories: [{
+      categoryId: ObjectId,
+      categoryName: String,
+      percentage: Number,
+      enabled: Boolean
+    }],
+    suppliers: [{
+      supplierId: ObjectId,
+      supplierName: String,
+      percentage: Number,
+      enabled: Boolean
+    }]
+  }
+}
+
+// Import Settings Structure
+{
+  key: 'import_settings',
+  value: {
+    autoImportEnabled: Boolean,
+    autoTranslation: Boolean,
+    defaultLanguage: String, // 'bn' | 'en'
+    maxConcurrentImports: Number,
+    timeoutSeconds: Number
+  }
+}
+
+// Indexes
+settings.key: unique
+settings.updatedAt: -1
+```
+
+**Note:** Database schema and API endpoints are flexible and subject to modifications during the development phase based on technical requirements and optimization needs.
+
 ---
 
 ## API Specifications
@@ -1427,6 +1533,11 @@ GET    /api/products/search
 GET    /api/products/categories/:categoryId
 GET    /api/products/:id/similar
 POST   /api/products/:id/track-view
+POST   /api/products/import-from-url       // Import from 1688.com URL
+POST   /api/products/import-preview        // Preview import before publishing
+POST   /api/products/bulk-import           // Import multiple URLs at once
+GET    /api/products/import-history        // View import logs
+POST   /api/products/import-retry/:id      // Retry failed import
 ```
 
 ### Category Management
@@ -1562,6 +1673,14 @@ PUT    /api/admin/reviews/:id/moderate
 GET    /api/admin/analytics
 PUT    /api/admin/settings
 GET    /api/admin/transactions
+GET    /api/admin/settings/markup              // Get markup settings
+PUT    /api/admin/settings/markup              // Update global markup percentage
+GET    /api/admin/settings/markup/categories   // Get category-specific markups
+PUT    /api/admin/settings/markup/categories   // Update category markup rates
+GET    /api/admin/settings/markup/suppliers    // Get supplier-specific markups
+PUT    /api/admin/settings/markup/suppliers    // Update supplier markup overrides
+GET    /api/admin/import-logs                  // View all import history
+GET    /api/admin/import-logs/:id              // View specific import details
 ```
 
 ### WebSocket Events (Socket.io)
