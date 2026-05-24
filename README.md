@@ -28,7 +28,7 @@ A comprehensive B2B marketplace platform connecting manufacturers, wholesalers, 
 
 | Topic | Amount | Total |
 |-------|--------|-------|
-| **Development Cost** | **$3200 Total (350,000 BDT)**<br>→ $1,000 at the beginning<br>→ $1,000 at 50% completion<br>→ Remaining balance after publication<br>**Includes:**<br>→ Android application development<br>→ iOS application development<br>→ Web admin dashboard development<br>→ Backend API development<br>→ Deployment and publishing support | **3,200 USD**<br>**350,000 BDT**<br>**(One Time)** |
+| **Development Cost** | **$2900 Total (350,000 BDT)**<br>→ $1,000 at the beginning<br>→ $1,000 at 50% completion<br>→ Remaining balance after publication<br>**Includes:**<br>→ Android application development<br>→ iOS application development<br>→ Web admin dashboard development<br>→ Backend API development<br>→ Deployment and publishing support | **3,200 USD**<br>**350,000 BDT**<br>**(One Time)** |
 | **Server Cost**<br>**(12 Months)** | **Hostinger VPS KVM4:**<br>$12.99/month × 24 = $311.76 | **382.57 USD**<br>**(12 Months)** |
 | **Database Cost** | **MongoDB:**<br>$8/month × 24 = $192 | |
 | **Domain + Email** | 14.99 + 20 = $34.99 | |
